@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "Novel Sorting Algorithms via Threshold Decomposition"
+message: "If you use this work, please cite it as below."
+type: software
+authors:
+  - family-names: "Tej"
+    given-names: "M. Panvi"
+affiliation: "Department of Computer Science and Engineering, Mahindra University"
+version: 1.0.0
+date-released: 2026-01-01
+license: MIT
+repository-code: "https://github.com/your-username/your-repo-name"
+keywords:
+  - sorting algorithms
+  - order statistics
+  - threshold decomposition
+  - boolean matrix
+  - weighted median
+  - hardware-oriented algorithms
