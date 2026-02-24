@@ -143,10 +143,8 @@ In architectures emphasizing parallelism or hardware specialization, Boolean dom
 src/
 ├─ hybrid_ads_boolean.py
 └─ weighted_median.py
-
 docs/
 └─ thesis.pdf
-
 examples/
 └─ demo.py
 
@@ -170,9 +168,6 @@ The broader contribution is conceptual: numerical ordering can be reformulated a
 
 ## Author
 
-**:contentReference[oaicite:0]{index=0}**  
-Department of Computer Science and Engineering  
-**:contentReference[oaicite:1]{index=1}**
+**Panvi Tej**  
+Computer Science and Engineering  
 
-Under the supervision of  
-**:contentReference[oaicite:2]{index=2}**
