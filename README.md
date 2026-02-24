@@ -1,169 +1,146 @@
-Weighted Boolean Threshold Decomposition
-A Structural Approach to Order Statistics
+Novel Sorting Algorithms via Threshold Decomposition
+A Boolean Matrix Framework for Order Statistics and Selection
 Overview
 
-This repository presents a structural framework for computing order statistics using threshold-based Boolean decomposition. The method reformulates classical selection problems—such as median, weighted median, and nth-order statistics—through vertical dominance layers defined over the value domain.
+This repository implements a Boolean logic–based framework for sorting and order-statistic computation derived from the thesis “Novel Sorting Algorithms Using Threshold Decomposition.”
 
-Instead of relying exclusively on positional indexing or partition-based recursion, the approach decomposes the dataset across discrete thresholds and evaluates dominance structure at each level. Order statistics emerge from cumulative dominance behavior rather than index selection alone.
+The central result of this work is that median, p-th maximum, p-th minimum, weighted median, and even full sorting can be computed using Boolean operations alone. The framework replaces direct element-to-element comparisons with threshold dominance evaluation, reformulating ordering as a structural property of logical representations rather than a positional property of numeric comparison.
 
-The implementation accompanies a formal IEEE-formatted thesis that provides proofs, theoretical grounding, and analytical evaluation.
+Core Idea
 
-Conceptual Foundation
+Given a dataset
 
-Let 
-𝐴
-=
-{
-𝑎
-1
-,
-…
-,
-𝑎
-𝑁
-}
-A={a
-1
-	​
+A = {a₁, a₂, …, aₙ}
 
-,…,a
-N
-	​
+For each integer threshold t, define a Boolean variable
 
-} be a finite set of ordered values.
-For each threshold 
-𝑡
-t, define:
+Xᵢ(t) = 1 if aᵢ ≥ t
+Xᵢ(t) = 0 otherwise
 
-𝐵
-𝑡
-(
-𝑖
-)
-=
-{
-1
-	
-if 
-𝑎
-𝑖
-≥
-𝑡
+Each threshold produces a Boolean dominance row describing which elements survive that level. As the threshold increases, the number of surviving elements monotonically decreases. Conceptually stacking these rows forms a Boolean dominance matrix.
 
+Order statistics are recovered by analyzing row-level dominance behavior. Instead of comparing elements directly, the algorithm determines where structural transitions occur in threshold space.
 
-0
-	
-otherwise
-B
-t
-	​
+This reframes selection as a vertical aggregation problem across dominance layers.
 
-(i)={
-1
-0
-	​
+Hybrid Adaptive Distinct Set (ADS) Optimization
 
-if a
-i
-	​
+A naive implementation would evaluate all integer thresholds from 0 to MAX, resulting in complexity proportional to N × MAX.
 
-≥t
-otherwise
-	​
+The Hybrid Adaptive Distinct Set optimization observes that structural transitions occur only at distinct input values. Intermediate thresholds produce identical Boolean rows and therefore contain no new information.
 
+Let
 
-Each threshold induces a Boolean dominance vector. The collection of such vectors across all relevant thresholds forms an implicit Boolean matrix that represents the vertical structure of the dataset.
+T = {τ₁ < τ₂ < … < τᵣ}
 
-Two core observations follow:
+be the sorted distinct values of the dataset. Computation is restricted to these thresholds. Each threshold is assigned an interval width
 
-Order statistics correspond to structural transitions in dominance balance.
+wₖ = τₖ − τₖ₋₁
 
-Weighted statistics correspond to cumulative mass crossings within these dominance layers.
+This collapses redundant thresholds while preserving exact correctness.
 
-This perspective transforms selection into a discrete integration problem over dominance strata.
+Complexity becomes proportional to N × R, where R is the number of distinct values. For sparse datasets, this significantly reduces computational cost.
 
-Implemented Components
-1. Weighted Boolean Matrix Trace
+Boolean Selection Rules
 
-Sorts values while preserving associated weights.
+At each threshold τ:
 
-Computes cumulative weight over threshold survival sets.
+ones = number of elements ≥ τ
+zeros = N − ones
 
-Identifies the weighted median as the first dominance level where cumulative mass exceeds half the total weight.
+Selection conditions are expressed purely as Boolean dominance rules:
 
-Provides trace output for structural inspection.
+Median condition:
+ones > zeros
 
-This formulation makes the weighted median equivalent to detecting a crossing in a discrete survival function.
+p-th maximum condition:
+ones ≥ P
 
-2. Hybrid ADS Boolean Operator
+p-th minimum condition:
+zeros < P
 
-The hybrid module generalizes threshold evaluation through rule-based activation:
+The final statistic is reconstructed by accumulating interval widths for thresholds satisfying the relevant rule.
 
-Majority dominance (median)
+Result = Σ wₖ · V(τₖ)
 
-P-th maximum condition
+This produces the exact order statistic without explicit comparison operations.
 
-P-th minimum condition
+Weighted Median
 
-Instead of selecting an index directly, the algorithm integrates rule activations across threshold widths. The resulting statistic is reconstructed from structural dominance intervals.
+For weighted datasets, each element aᵢ has an associated positive weight wᵢ.
 
-This creates a unified mechanism for multiple order-statistic types within a single Boolean framework.
+Total weight:
+W_total = Σ wᵢ
 
-Why This Matters
+The weighted median is defined as the smallest value whose cumulative weight is at least W_total / 2.
 
-Classical approaches such as QuickSelect optimize positional selection but provide limited structural insight. The threshold-decomposition model emphasizes:
+The thesis establishes that:
 
-Deterministic behavior
+The weighted median reduces to the ordinary median when all weights are equal.
 
-Interpretability of dominance structure
+Weighted selection is equivalent to computing the median of a logically expanded multiset.
 
-Natural extension to weighted settings
+The Boolean threshold framework remains structurally valid in the weighted setting.
 
-Unified treatment of multiple selection rules
+This demonstrates theoretical consistency between weighted and unweighted formulations.
 
-The method is particularly suitable for bounded integer domains or contexts where structural analysis is as important as computational efficiency.
+Sorting via Boolean Selection
+
+Sorting can be expressed as repeated Boolean selection:
+
+Extract minimum (p-th minimum with P = 1)
+
+Remove or mark the element
+
+Repeat
+
+Thus, full sorting becomes a sequence of Boolean dominance resolutions. This shows that ordering operations are reducible to logical aggregation rather than arithmetic comparison.
+
+Hardware and Parallel Relevance
+
+The framework is particularly aligned with hardware-oriented computation:
+
+Boolean operations map directly to logic gates.
+
+Threshold evaluations can be parallelized.
+
+Bit-vector representations enable wide logical operations.
+
+No complex arithmetic units are required.
+
+In architectures emphasizing parallelism or hardware specialization, Boolean dominance evaluation can offer structural advantages.
 
 Repository Structure
-src/            Core algorithms
-experiments/    Benchmark scripts
-tests/          Unit validation
-examples/       Minimal working demos
-docs/           IEEE thesis (PDF)
-Minimal Example
-from src.weighted_median import weighted_boolean_matrix_trace
 
-arr = [4, 5, 6, 7, 8]
-weights = [3, 2, 4, 6, 5]
+src/
+ hybrid_ads_boolean.py
+ weighted_median.py
 
-weighted_boolean_matrix_trace(arr, weights)
-Complexity
+docs/
+ thesis.pdf
 
-Sorting: 
-𝑂
-(
-𝑁
-log
-⁡
-𝑁
-)
-O(NlogN)
+examples/
+ demo.py
 
-Threshold scan: 
-𝑂
-(
-𝑅
-𝑁
-)
-O(RN)
+Research Positioning
 
-Median detection: 
-𝑂
-(
-𝑁
-)
-O(N)
+This work connects:
 
-Where 
-𝑅
-R is the value range.
-For bounded domains, performance is predictable and stable.
+Order statistics theory
+
+Threshold logic
+
+Boolean matrix representations
+
+Hardware-conscious algorithm design
+
+It extends ideas historically used in median filtering and threshold logic into a generalized framework for sorting and selection.
+
+The broader contribution is conceptual: numerical ordering can be reformulated as a logical dominance problem without loss of correctness or interpretability.
+
+Author
+
+M. Panvi Tej
+Department of Computer Science and Engineering
+Mahindra University
+Under the supervision of Dr. Garimella Rama Murthy
